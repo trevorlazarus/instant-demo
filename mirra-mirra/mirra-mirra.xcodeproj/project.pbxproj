@@ -1,0 +1,420 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		69D5FB371E390DEE00E42914 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D5FB361E390DEE00E42914 /* AppDelegate.swift */; };
+		69D5FB391E390DEE00E42914 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D5FB381E390DEE00E42914 /* ViewController.swift */; };
+		69D5FB3C1E390DEE00E42914 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 69D5FB3A1E390DEE00E42914 /* Main.storyboard */; };
+		69D5FB3E1E390DEE00E42914 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 69D5FB3D1E390DEE00E42914 /* Images.xcassets */; };
+		69D5FB411E390DEE00E42914 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 69D5FB3F1E390DEE00E42914 /* LaunchScreen.xib */; };
+		69D5FB4D1E390DEE00E42914 /* mirra_mirraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69D5FB4C1E390DEE00E42914 /* mirra_mirraTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		69D5FB471E390DEE00E42914 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 69D5FB291E390DEE00E42914 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 69D5FB301E390DEE00E42914;
+			remoteInfo = "mirra-mirra";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		69D5FB311E390DEE00E42914 /* mirra-mirra.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "mirra-mirra.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		69D5FB351E390DEE00E42914 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		69D5FB361E390DEE00E42914 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		69D5FB381E390DEE00E42914 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		69D5FB3B1E390DEE00E42914 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		69D5FB3D1E390DEE00E42914 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		69D5FB401E390DEE00E42914 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		69D5FB461E390DEE00E42914 /* mirra-mirraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mirra-mirraTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		69D5FB4B1E390DEE00E42914 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		69D5FB4C1E390DEE00E42914 /* mirra_mirraTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = mirra_mirraTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		69D5FB2E1E390DEE00E42914 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		69D5FB431E390DEE00E42914 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		69D5FB281E390DEE00E42914 = {
+			isa = PBXGroup;
+			children = (
+				69D5FB331E390DEE00E42914 /* mirra-mirra */,
+				69D5FB491E390DEE00E42914 /* mirra-mirraTests */,
+				69D5FB321E390DEE00E42914 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		69D5FB321E390DEE00E42914 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				69D5FB311E390DEE00E42914 /* mirra-mirra.app */,
+				69D5FB461E390DEE00E42914 /* mirra-mirraTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		69D5FB331E390DEE00E42914 /* mirra-mirra */ = {
+			isa = PBXGroup;
+			children = (
+				69D5FB361E390DEE00E42914 /* AppDelegate.swift */,
+				69D5FB381E390DEE00E42914 /* ViewController.swift */,
+				69D5FB3A1E390DEE00E42914 /* Main.storyboard */,
+				69D5FB3D1E390DEE00E42914 /* Images.xcassets */,
+				69D5FB3F1E390DEE00E42914 /* LaunchScreen.xib */,
+				69D5FB341E390DEE00E42914 /* Supporting Files */,
+			);
+			path = "mirra-mirra";
+			sourceTree = "<group>";
+		};
+		69D5FB341E390DEE00E42914 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				69D5FB351E390DEE00E42914 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		69D5FB491E390DEE00E42914 /* mirra-mirraTests */ = {
+			isa = PBXGroup;
+			children = (
+				69D5FB4C1E390DEE00E42914 /* mirra_mirraTests.swift */,
+				69D5FB4A1E390DEE00E42914 /* Supporting Files */,
+			);
+			path = "mirra-mirraTests";
+			sourceTree = "<group>";
+		};
+		69D5FB4A1E390DEE00E42914 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				69D5FB4B1E390DEE00E42914 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		69D5FB301E390DEE00E42914 /* mirra-mirra */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 69D5FB501E390DEE00E42914 /* Build configuration list for PBXNativeTarget "mirra-mirra" */;
+			buildPhases = (
+				69D5FB2D1E390DEE00E42914 /* Sources */,
+				69D5FB2E1E390DEE00E42914 /* Frameworks */,
+				69D5FB2F1E390DEE00E42914 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "mirra-mirra";
+			productName = "mirra-mirra";
+			productReference = 69D5FB311E390DEE00E42914 /* mirra-mirra.app */;
+			productType = "com.apple.product-type.application";
+		};
+		69D5FB451E390DEE00E42914 /* mirra-mirraTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 69D5FB531E390DEE00E42914 /* Build configuration list for PBXNativeTarget "mirra-mirraTests" */;
+			buildPhases = (
+				69D5FB421E390DEE00E42914 /* Sources */,
+				69D5FB431E390DEE00E42914 /* Frameworks */,
+				69D5FB441E390DEE00E42914 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				69D5FB481E390DEE00E42914 /* PBXTargetDependency */,
+			);
+			name = "mirra-mirraTests";
+			productName = "mirra-mirraTests";
+			productReference = 69D5FB461E390DEE00E42914 /* mirra-mirraTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		69D5FB291E390DEE00E42914 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+				ORGANIZATIONNAME = "Core Digital";
+				TargetAttributes = {
+					69D5FB301E390DEE00E42914 = {
+						CreatedOnToolsVersion = 6.2;
+					};
+					69D5FB451E390DEE00E42914 = {
+						CreatedOnToolsVersion = 6.2;
+						TestTargetID = 69D5FB301E390DEE00E42914;
+					};
+				};
+			};
+			buildConfigurationList = 69D5FB2C1E390DEE00E42914 /* Build configuration list for PBXProject "mirra-mirra" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 69D5FB281E390DEE00E42914;
+			productRefGroup = 69D5FB321E390DEE00E42914 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				69D5FB301E390DEE00E42914 /* mirra-mirra */,
+				69D5FB451E390DEE00E42914 /* mirra-mirraTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		69D5FB2F1E390DEE00E42914 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69D5FB3C1E390DEE00E42914 /* Main.storyboard in Resources */,
+				69D5FB411E390DEE00E42914 /* LaunchScreen.xib in Resources */,
+				69D5FB3E1E390DEE00E42914 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		69D5FB441E390DEE00E42914 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		69D5FB2D1E390DEE00E42914 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69D5FB391E390DEE00E42914 /* ViewController.swift in Sources */,
+				69D5FB371E390DEE00E42914 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		69D5FB421E390DEE00E42914 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				69D5FB4D1E390DEE00E42914 /* mirra_mirraTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		69D5FB481E390DEE00E42914 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 69D5FB301E390DEE00E42914 /* mirra-mirra */;
+			targetProxy = 69D5FB471E390DEE00E42914 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		69D5FB3A1E390DEE00E42914 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				69D5FB3B1E390DEE00E42914 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		69D5FB3F1E390DEE00E42914 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				69D5FB401E390DEE00E42914 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		69D5FB4E1E390DEE00E42914 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		69D5FB4F1E390DEE00E42914 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		69D5FB511E390DEE00E42914 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = "mirra-mirra/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		69D5FB521E390DEE00E42914 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = "mirra-mirra/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		69D5FB541E390DEE00E42914 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "mirra-mirraTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mirra-mirra.app/mirra-mirra";
+			};
+			name = Debug;
+		};
+		69D5FB551E390DEE00E42914 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "mirra-mirraTests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mirra-mirra.app/mirra-mirra";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		69D5FB2C1E390DEE00E42914 /* Build configuration list for PBXProject "mirra-mirra" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69D5FB4E1E390DEE00E42914 /* Debug */,
+				69D5FB4F1E390DEE00E42914 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		69D5FB501E390DEE00E42914 /* Build configuration list for PBXNativeTarget "mirra-mirra" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69D5FB511E390DEE00E42914 /* Debug */,
+				69D5FB521E390DEE00E42914 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		69D5FB531E390DEE00E42914 /* Build configuration list for PBXNativeTarget "mirra-mirraTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				69D5FB541E390DEE00E42914 /* Debug */,
+				69D5FB551E390DEE00E42914 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 69D5FB291E390DEE00E42914 /* Project object */;
+}

@@ -1,0 +1,85 @@
+<?php
+/**
+ * Implements hook_menu()
+ */
+function testing_mail_menu() {
+ $items['testing-mail'] = array(
+  'title' => 'Testing to send mail', //The name of the menu that will be displayed
+  'page callback' => 'testing_mail_page_callback', //The name of the function that will output a page
+  'access callback' => TRUE
+ );
+ return $items;
+}
+ 
+function testing_mail_page_callback() {
+ //The argument is the name of the function with the form details
+ return drupal_get_form('testing_mail_form');
+}
+
+function testing_mail_form($form, &$form_state) {
+ $form['manuscript_link'] = array(
+    '#title' => t('Manuscript Link'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  );
+  $form['orcid_link'] = array(
+    '#title' => t('Orcid Link'),
+    '#type' => 'textfield',
+  );
+  $form['instructions_link'] = array(
+    '#title' => t('Instructions Link'),
+    '#type' => 'textfield',
+  );
+  $form['submit'] = array(
+    '#value' => 'Submit',
+    '#type' => 'submit',
+    );
+  return $form;
+}
+
+function testing_mail_form_submit($form, &$form_state) {
+ //My success processing
+ // drupal_set_message($form_state['values']['manuscript_link']);
+ // drupal_set_message($form_state['values']['orcid_link']);
+ // drupal_set_message($form_state['values']['instructions_link']);
+ send_mail($form_state);
+}
+
+function send_mail($form_state){
+	drupal_set_message('inside email');
+	$email_list = array('iswariya@newgen.co','iswariya@coredigital.co', 'iswariyaravi@gmail.com', 'iswariyaravi@outlook.com');
+	foreach ($email_list as $i => $value) {
+		$module = 'multiple_margins';
+		$key = 'key';
+		$language = language_default();
+		$params = array();
+		$from = "noreply@submissions.iospress.com";
+		$email = $email_list[$i];
+		$send = TRUE;
+		$message = drupal_mail($module, $key, $email, $language, $params, $from, $send);
+
+		$message['subject'] = "Invitation from Prem Ramasamy to review for Data Science";
+		$message['body'] = array();
+		$message['body'][] = "Dear Iswariya R,";
+		$message['body'][] = "I am an editor of the journal Data Science, and I would like to ask you whether you could help me with evaluating the manuscript noted below.";
+		$message['body'][] = "Our journal has a number of unusual features to make reviewing more rewarding: All submissions are available as open preprints, so you can share and discuss the manuscript with whoever you like. We furthermore encourage you to make your review non-anonymous, so you can share it on your blog or on social media, and refer to it in your resume. We moreover aim to make acceptance decisions within a few weeks, and accepted articles are all Open Access and their content can therefore be freely accessed and reused.";
+		$message['body'][] = "Manuscript: Prem Ramasamy, Test Jasmine. Test ('Research Paper').".$form_state['values']['manuscript_link'];
+		$message['body'][] = "You can use this link to accept or decline this review invitation: ".$form_state['values']['orcid_link'];
+		$message['body'][] = "If you decide to accept, I would very much appreciate receiving your review within 10 days, to allow for the mentioned fast response to authors.";
+		$message['body'][] = "Instructions for reviewers can be found at ".$form_state['values']['instructions_link'];
+		$message['body'][] = "Thank you for your consideration.";
+		$message['body'][] = "With kind regards,";
+		$message['body'][] = "Prem Ramasamy";
+
+		// Retrieve the responsible implementation for this message.
+		$system = drupal_mail_system($module, $key);
+
+		// Format the message body.
+		$message = $system->format($message);
+
+		// Send e-mail.
+		$message['result'] = $system->mail($message);			
+	}	
+}
+
+?>

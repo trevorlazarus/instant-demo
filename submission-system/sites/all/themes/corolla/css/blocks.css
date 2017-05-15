@@ -1,0 +1,261 @@
+/* Blocks */
+.block {
+  clear: both;
+  margin-bottom: 25px;
+}
+.block:last-child {
+  margin-bottom: 15px;
+}
+.block-title {
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.3;
+  margin: 0;
+  padding: 0 0 4px;
+  text-transform: uppercase;
+}
+#block-system-main .block-inner {
+  margin: 0;
+}
+
+#menu-bar #block-block-12{
+	float: right;
+	padding-top: 10px;
+}
+#block-block-12 a{
+	color: #fcfcfc;
+}
+#block-block-12 ul a:hover{
+	background: #e25402;
+}
+
+
+#block-block-13{
+	padding-left: 20px;
+}
+
+#block-block-13 a{
+	color: #fcfcfc;
+}
+
+#block-block-13 ul a:hover{
+	color: #e25402;
+}
+#block-block-13 h2, h2 {
+    color: #0077b3;
+	text-size:smaller;
+}
+
+#block-block-13 ul, ol {
+    margin: 0 0 1em 4px; 
+    padding: 0;
+}
+
+
+#block-block-14{
+	text-align:left;
+	padding-left: 20px;
+}
+
+#block-block-14 a{
+	color: #fcfcfc;
+}
+
+#block-block-14 ul a:hover{
+	color: #e25402;
+}
+#block-block-14 h2, h2 {
+    color: #0077b3;
+}
+
+#block-block-14 ul, ol {
+    margin: 0 0 1em 4px; 
+    padding: 0;
+}
+
+#block-block-15 a{
+	color: #fcfcfc;
+}
+
+#block-block-15 ul a:hover{
+	color: #e25402;
+}
+
+#block-block-15 a{
+	color: #fcfcfc;
+}
+
+#block-block-15 ul a:hover{
+	color: #e25402;
+}
+
+#block-block-15 h2, h2 {
+    color: #0077b3;
+}
+
+#block-block-15 h2, h2 {
+  list-style-type: none;
+}
+
+
+#block-block-15 ul, ol {
+    margin: 0 0 1em 4px; 
+    padding: 0;
+}
+
+
+
+
+
+
+
+
+
+#block-block-16 a{
+	color: #086782;
+}
+
+#block-block-16 ul a:hover{
+	color: #e25402;
+}
+
+#block-block-16 h2, h2 {
+    color: #0077b3;
+}
+#block-block-16 ul, ol {
+    margin: 0 0 1em 4px; 
+    padding: 0;
+
+}
+
+#menu-bar #block-block-17{
+	float: right;
+	padding-top: 10px;
+}
+#block-block-17 a{
+	color: #fcfcfc;
+}
+#block-block-17 ul a:hover{
+	background: #e25402;
+}
+
+#block-block-16{
+  float:right;
+  padding-right:38%;
+}
+
+#block-block-7{
+        text-align:left;
+        padding-left: 20px;
+}
+#block-block-7 a{
+        color: #fcfcfc;
+}
+#block-block-7 ul a:hover{
+        color: #e25402;
+}
+#block-block-7 h2, h2 {
+    color: #0077b3;
+}
+#block-block-7 ul, ol {
+    margin: 0 0 1em 4px;
+    padding: 0;
+}
+
+
+#dashboard .block ul {
+  margin-left: 0;
+}
+.mini-panel-title {
+  margin: 0 10px;
+}
+.region-secondary-content .block {
+  line-height: 1.35;
+  text-shadow: 1px 1px 1px #fff;
+  text-align: center;
+  margin-bottom: 35px;
+}
+.region-header .block {
+  margin-top: 20px;
+}
+.region-header .block-superfish {
+  margin-top: 36px;
+}
+#menu-bar .block {
+  float: left;
+  clear: none;
+  margin-bottom: -10px;
+}
+#menu-bar #block-system-user-menu {
+  float: right;
+}
+.block .item-list ul  {
+  margin-left: 1em;
+}
+.block-panels_mini .mini-panel-title {
+  margin: 0 10px;
+}
+.block-poll ul.links li {
+  list-style: none;
+  margin: 0 0.5em 0 0;
+}
+
+/* Horizontal login in the menu bar */
+#menu-bar .lb-h label {
+  color: #fff;
+}
+#menu-bar #block-user-login.lb-h .item-list {
+  margin-top: 3px;
+  font-size: 0.9em;
+  line-height: 1em;
+}
+#menu-bar #block-user-login.lb-h .item-list li {
+  float: none;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+#menu-bar #block-user-login.lb-h .form-actions {
+  padding-top: 2px;
+}
+
+.news {
+	align:center;
+    width: 95%;
+    
+    max-height: 500px;
+    margin: 10px;
+    border: 0px solid #fff;
+    background-color: #ffffff;
+    box-shadow: 0px 2px 7px #292929;
+    -moz-box-shadow: 0px 2px 7px #292929;
+    -webkit-box-shadow: 0px 2px 7px #292929;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+}
+.news-body,
+.news-header {
+    padding: 5px;
+}
+.news-body {
+    
+    min-height: 150px;
+    max-height: 388px;
+    overflow: auto;
+}
+.news-header {
+    height: 20px;
+    font-weight:bold;
+    font-size:13pt;
+    color: #fcfcfc;
+    text-align: center;
+    border-bottom: 1px solid #EEE;
+    background-color: rgb(46, 46, 46);
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-top-right-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-topright: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}

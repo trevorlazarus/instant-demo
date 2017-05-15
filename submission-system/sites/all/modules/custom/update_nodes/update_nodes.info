@@ -1,0 +1,7 @@
+; $Id$
+name = Update Existing nodes
+description = "Update existing node fields"
+package = Custom
+core = 7.x
+files[] = update_nodes.module
+

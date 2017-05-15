@@ -1,0 +1,5 @@
+; $Id$
+name = Reminder Email
+description = "Email to send based on reminders set by EIC or Editors"
+package = swj
+core = 7.x

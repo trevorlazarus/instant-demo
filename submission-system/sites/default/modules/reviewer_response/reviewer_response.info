@@ -1,0 +1,4 @@
+name = Reviewer Response
+description = Collect a reviewer response without logging in
+core = 7.x
+package = Custom

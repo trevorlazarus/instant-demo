@@ -1,0 +1,5 @@
+;$Id$
+name = Orcid Authentication
+description = Orcid User Automatic Authentication
+package = Custom Module
+core = 7.x

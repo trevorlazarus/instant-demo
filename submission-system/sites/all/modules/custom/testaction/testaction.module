@@ -1,0 +1,535 @@
+<?php
+require ("testaction_constants.inc");
+
+
+
+
+function emailConfirmationOne($emailIds, $node) {
+	foreach ($emailIds as $email) {
+		$account = user_load_by_mail($email);
+		$params['account'] = $account;
+		$params['tracking'] = $node -> nid . '-' . $node -> vid;
+		drupal_mail('testaction', 'author_review', $account -> mail, user_preferred_language($account), $params);
+	}
+}
+
+function emailConfirmation($emailIds) {
+	foreach ($emailIds as $email) {
+		$account = user_load_by_mail($email);
+		if (!$account) {
+			createUser($email);
+		} else {
+			$params['account'] = $account;
+			drupal_mail('testaction', 'submit_exist', $account -> mail, user_preferred_language($account), $params);
+		}
+	}
+}
+
+function notifyEicMSG($mtype, $node = null) {
+
+	if (isset($node)) {
+                        $params['tracking'] = $node -> nid . '-' . $node -> vid;
+                        $params['nid'] = $node->nid;
+                }
+	drupal_mail('testaction', $mtype, get_eic_emails(), '', $params);
+}
+
+function createUser($emailId, $name = null, $firstname, $lastname, $active = 0, $node = null) {
+	if (!is_null($name)) {
+	    $edit = array(
+            'field_last_name' => array('und'=>array(0=>array('value'=>$lastname))),
+            'field_first_name' => array('und'=>array(0=>array('value'=>$firstname))),
+            'name' => $name,
+            'mail' => $emailId,
+            'pass' => user_password(5),
+            'status' => 1
+        
+			
+		);
+	}else {
+		$edit = array(
+			'name' => $emailId,
+			'mail' => $emailId
+		);
+	}
+//	$acc = array('is_new' => TRUE);
+//	$result = user_save((Object)$acc, $edit);
+        $account = user_save(drupal_anonymous_user(), $edit);
+//	if (!$result) {
+         if (!$account) {
+		watchdog('user creation', 'user creation failed');
+	}
+//	$accounts = array($result);
+        user_set_authmaps($account, array("authname_$module" => $name));
+	if ($active == 1) {
+
+	//	$params['account'] = $result;
+                $params['account'] = $account;    
+
+
+		//The commented line was used for account creation if the co-author/reviewer is not in the system.
+		//$mail = drupal_mail('user', 'register_no_approval_required', $result -> mail, user_preferred_language($result), $params);
+		
+
+	} else {
+            _user_mail_notify('register_pending_approval', $account, $language = NULL);
+	//	_user_mail_notify('register_pending_approval', $result, $language = NULL);
+	}
+	//if (is_null($name)) testaction_notify($accounts, $node);
+        return $account;
+//	return $result;
+}
+
+function testaction_notify($accounts, $node = null) {
+	foreach ($accounts as $account) {
+		$params['account'] = $account;
+		$params['tracking'] = $node -> nid . '-' . $node - vid;
+		drupal_mail('testaction', 'submit', $account -> mail, user_preferred_language($account), $params);
+	}
+}
+function replace_email_tokens($nid, $msg){
+    global $base_url;
+    $editor_name ="Editor";
+	$editors_email = " ";
+	$node = node_load($nid);
+	$previous_nid = db_query("SELECT field_previous_version_nid FROM {field_data_field_previous_version} where entity_id = :nid", array( ':nid' => $node-> nid )) -> fetchField();
+         $editor_uid = get_responsible_editor($node);
+         if($editor_uid != '' ){
+		$editor = user_load(get_responsible_editor($node));
+		//$fullname = $account -> field_first_name['und'][0]['value'] ." ". $account -> field_last_name['und'][0]['value'];
+		$msg = str_replace('{{editor}}', $editor-> field_first_name['und'][0]['value'] ." ". $editor -> field_last_name['und'][0]['value'],$msg);
+	        $msg = str_replace('{{editor_email}}', $editor->mail,$msg);
+	 }
+        
+       else{
+            $msg = str_replace('{{editor}}', $editor_name,$msg);
+		   $msg = str_replace('{{editor_email}}', $$editors_email,$msg);
+
+}
+         //$sub = str_replace('{{tracking_number}}', $node->nid . '-' . $node->vid, $sub);
+         $msg = str_replace('{{tracking_number}}', $node -> nid . '-' . $node -> vid, $msg);
+         //$msg = str_replace('{{reviewer}}', $name, $msg);
+         //$msg = str_replace('{{username}}', $name, $msg);
+         $msg = str_replace('{{authors}}', get_author_names($node), $msg);
+		 $msg = str_replace('{{authoremail}}', get_author_emails($node), $msg);
+         $msg = str_replace('{{url}}', '<a href="'.url(drupal_get_path_alias('node/' . $node -> nid), array('absolute' => TRUE)).'">Click here to follow the link</a>', $msg);
+	 $msg = str_replace('{{prev_url}}', '<a href="'.url(drupal_get_path_alias('node/' . $previous_nid), array('absolute' => TRUE)).'">Click here to follow the link</a>', $msg);
+		 $msg = str_replace('{{title}}', $node->title, $msg);
+         $msg = str_replace('{{abstract}}', $node->field_abstract['und'][0]['value'], $msg);
+         $msg = str_replace('{{site_url}}', '<a href="'.$base_url.'">Click here to follow the link</a>', $msg);
+		 $msg = str_replace('{{site_url_guidelines}}', '<a href="'.$base_url.'/content/guidelines">Click here to follow the link</a>', $msg);
+       
+	     $submission_type = $node->field_submission_type['und'][0]['value'];
+         $msg = str_replace('{{submission_type}}', '\''.$submission_type.'\'', $msg);
+
+        return $msg;
+}
+
+function get_decision_from_key($str){
+				if ($str == 'accept')
+                                        $suggestion = t('Accept');
+                                else if ($str == 'minor')
+                                        $suggestion = t('Minor revision');
+                                else if ($str  == 'major')
+                                        $suggestion = t('Major revision');
+                                else if ($str == 'rej resub')
+                                        $suggestion = t('Reject and resubmit');
+                                else if ($str == 'reject')
+                                        $suggestion = t('Reject');
+                                else
+                                        $suggestion = '';
+
+return $suggestion;
+}
+
+function get_eic_emails(){
+   $emails = '';
+   $eic = 'EditorInChief';
+                      //  $result = db_query("Select distinct u.uid from users_roles u INNER JOIN role r on u.rid = r.rid where r.name='" . $eic . "'");
+                      // $result = db_query("Select distinct u.uid from users_roles u INNER JOIN role r on u.rid = r.rid INNER JOIN users ur on u.uid = ur.uid where r.name='" . $eic . "'and ur.mail not in ('iswariya@newgen.co','sugirtha@epagemaker.com','editorinchiefios@yahoo.com','assistanteditorios@yahoo.com','prem.mlyr@gmail.com','s.delbecque@iospress.nl') "); 
+
+                $result = db_query("Select distinct u.uid from users_roles u INNER JOIN role r on u.rid = r.rid INNER JOIN users ur on u.uid = ur.uid where r.name='".$eic."'and ur.mail NOT LIKE '%newgen.co' and ur.mail NOT LIKE '%coredigital.co' and ur.mail NOT LIKE '%epagemaker.com' and ur.mail NOT LIKE '%iospress.nl' and ur.mail NOT LIKE 'muthukrishnan.ramasamy@newgen.co' and ur.mail NOT LIKE 'prem.mlyr@gmail.com' and ur.mail NOT LIKE 'editorinchiefios@yahoo.com' and ur.mail NOT LIKE 'assistanteditorios@yahoo.com'"); 
+
+
+                        $first = true;
+                        foreach ($result as $row) {
+                        if($emails == ''){
+				     
+                       if(user_load($row -> uid)->mail == ''){
+								
+			}else{
+                      	$emails = user_load($row -> uid)->mail;
+                        }
+				        }else{
+                               
+                        if(user_load($row -> uid)->mail == ''){
+								
+					}else{
+                          $emails .= ','.user_load($row -> uid)->mail;
+				        }
+                             } 
+                          }
+
+   return $emails;
+}
+
+
+function get_eic_coredigital_emails(){
+   $emails = '';
+   $eic = 'EditorInChief';
+                      //  $result = db_query("Select distinct u.uid from users_roles u INNER JOIN role r on u.rid = r.rid where r.name='" . $eic . "'");
+                      // $result = db_query("Select distinct u.uid from users_roles u INNER JOIN role r on u.rid = r.rid INNER JOIN users ur on u.uid = ur.uid where r.name='" . $eic . "'and ur.mail not in ('iswariya@newgen.co','sugirtha@epagemaker.com','editorinchiefios@yahoo.com','assistanteditorios@yahoo.com','prem.mlyr@gmail.com','s.delbecque@iospress.nl') "); 
+
+                     $result = db_query("Select distinct u.uid from users_roles u INNER JOIN role r on u.rid = r.rid INNER JOIN users ur on u.uid = ur.uid where r.name='".$eic."'and ur.mail LIKE '%newgen.co' or ur.mail LIKE '%cordigital.co' or ur.mail LIKE '%epagemaker.com' or ur.mail LIKE '%iospress.nl' or ur.mail LIKE 'muthukrishnan.ramasamy@newgen.co' or ur.mail LIKE 'prem.mlyr@gmail.com' or ur.mail LIKE 'editorinchiefios@yahoo.com' or ur.mail LIKE 'assistanteditorios@yahoo.com'");  
+
+                        $first = true;
+                        foreach ($result as $row) {
+                        if($emails == ''){
+		        if(user_load($row -> uid)->mail == ''){
+								
+			}else{		        
+                    	$emails = user_load($row -> uid)->mail;
+                         }
+				        }else{
+                       if(user_load($row -> uid)->mail == ''){
+								
+					}else{          
+                       $emails .= ','.user_load($row -> uid)->mail;
+		         	}	       
+                          }
+                        }
+
+   return $emails;
+}
+
+
+
+function testaction_mail($key, &$message, $params) {
+		$message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
+		$data = array();
+        $filepath = $params['attachment'];
+		if($filepath!='' || $filepath!=0)
+		{
+		$results = db_query("Select filename,uri,filemime from file_managed where fid='" . $filepath . "'");
+        foreach($results as $result)
+
+      {
+        $attachment = array(
+        'filecontent' =>file_get_contents($result->uri),
+        'filename' => $result->filename,
+         'filemime' => $result->filemime,
+     );
+
+
+	if (isset($params['account'])) {
+		$data['user'] = $params['account'];
+	}
+	$options['language'] = $message['language'];
+	user_mail_tokens($variables, $data, $options);
+    
+	switch($key) {
+		case 'submit_exist' :
+	                $orcidurl='https://orcid.org/oauth/authorize?client_id=APP-056GSP3J5RDS9KCM&response_type=code&scope=/authenticate&redirect_uri=http://104.197.102.240/data-science/';	
+       			$body = variable_get('email_author_submission_message', AUTHOR_SUBMISSION_MESSAGE);
+			$body .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$body = str_replace('{{author}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+		    $body = str_replace('{{author_email}}', $params['account'] -> mail, $body); 
+			$body = str_replace('{{orcid_url}}', '<a href="'.$orcidurl.'">Click here to follow the link</a>', $body); 
+			$body = str_replace('{{tracking_number}}', $params['tracking_number'], $body);
+			$subject = variable_get('email_author_submission_subject', AUTHOR_SUBMISSION_SUBJECT);
+			$subject = str_replace('{{tracking_number}}', $params['tracking_number'], $subject);
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t($body, $variables, array('langcode' => $langcode));
+			break;
+
+		case 'submit' :
+	                     $orcidurl='https://orcid.org/oauth/authorize?client_id=APP-056GSP3J5RDS9KCM&response_type=code&scope=/authenticate&redirect_uri=http://104.197.102.240/data-science/';	
+                 	$subject = variable_get('author_new_submission_subject', AUTHOR_SUBMISSION_NEW);
+
+			$subject = str_replace('{{tracking_number}}', $params['tracking_number'], $subject);
+
+			$body = variable_get('author_new_submission_message', AUTHOR_SUBMISSION_NEW_MSG);
+			$body = str_replace('{{tracking_number}}', $params['tracking_number'], $body);
+			$body .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$body = str_replace('{{author}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+			$body = str_replace('{{login}}', $params['account'] -> name, $body);
+			//$body = str_replace('{{author_email}}', $params['account'] -> mail, $body);
+			$body = str_replace('{{orcid_url_email}}', '<a href="'.$orcidurl.'?mail='.$params['account'] -> mail.'">Click here to follow the link</a>', $body);			
+            $langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t($body, $variables, array('langcode' => $langcode));
+			break;
+
+		case 'author_review' :
+			$subject = SUBMISSION_AUTHOR_APR_SUB;
+			$subject = str_replace('{{tracking_number}}', $params['tracking'], $subject);
+
+			$body = SUBMISSION_AUTHOR_APR_MSG;
+			$body .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$body = str_replace('{{author}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+            $body = str_replace('{{authoremail}}', $params['account'] ->mail, $body);
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t($body, $variables, array('langcode' => $langcode));
+			break;
+
+		case 'eic_submit' :
+			$langcode = '';//$message['language'] -> language;
+                        $sub = replace_email_tokens($params['nid'], variable_get('eic_submission_subject', SUBMISSION_EIC_SUB));
+                        $msg = replace_email_tokens($params['nid'], variable_get('eic_submission_message', SUBMISSION_EIC_MSG));
+			$message['subject'] = t($sub, array(), array('langcode' => $langcode));
+			$message['body'][] = t($msg, array(), array('langcode' => $langcode));
+
+			if(isset($params['cc']) && $params['cc'] != ''){
+			  $message['headers']['cc'] = $params['cc'];
+			}
+	                if(isset($params['bcc']) && $params['bcc'] != ''){
+			  $message['headers']['bcc'] = $params['bcc'];
+			}	
+			break;
+
+		case 'eic_decision' :
+			$subject = variable_get('email_decision_draft_subject', REV_DEC_LETTER_SUB);
+			$subject = str_replace('{{tracking_number}}', $params['tracking'], $subject);
+
+			$langcode = '';
+			$message['subject'] = t($subject, array(), array('langcode' => $langcode));
+                        $msg = replace_email_tokens($params['nid'], variable_get('email_decision_draft_message', REV_DEC_LETTER_MSG));
+			$msg .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$message['body'][] = t($msg, array(), array('langcode' => $langcode));
+			break;
+
+		case 'eic_decision_pre' :
+			$subject = variable_get('email_min_eic_subject', REV_DEC_EIC_SUB);
+			$subject = str_replace('{{tracking_number}}', $params['tracking'], $subject);
+
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t(variable_get('email_min_eic_message', REV_DEC_EIC_MSG) .  variable_get('review_management_email_notice', SWJ_NOTICE), $variables, array('langcode' => $langcode));
+			break;
+
+		case 'editor' :
+			$subject = variable_get('email_editor_assn_subject', SUBMISSION_EDITOR_SUB);
+			$subject = str_replace('{{tracking_number}}', '', $subject);
+
+			$body = variable_get('email_editor_assn_message', SUBMISSION_EDITOR_MSG);
+			$body = str_replace('{{editor}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+			$body = str_replace('{{editoremail}}', $params['account'] ->mail, $body);
+			$body .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t($body, $variables, array('langcode' => $langcode));
+			break;
+
+		case 'one-one' :
+            $eic_emails = get_eic_emails();
+            $langcode = '';
+			$message['subject'] = $params['subject'];
+			$body = $params['message'];
+
+			$message['body'][] = t($body, array(), array('langcode' => $langcode));
+
+			if(isset($params['cc']) && $params['cc'] != ''){
+			  $message['headers']['cc'] = $params['cc'];
+			}
+                        
+                        if(isset($params['bcc']) && $params['bcc'] != ''){
+			  $message['headers']['bcc'] = $params['bcc'];
+			}
+
+			if(isset($params['Reply-to'])){
+				$message['headers']['Reply-to'] = $params['Reply-to'];
+			}
+            if (isset($params['attachment'])) {
+				$message['params']['attachments'][] = $attachment;
+				}
+
+                
+                   	break;
+	}
+}
+			
+		}
+    else{
+	if (isset($params['account'])) {
+		$data['user'] = $params['account'];
+	}
+	$options['language'] = $message['language'];
+	user_mail_tokens($variables, $data, $options);
+    
+	switch($key) {
+		case 'submit_exist' :
+                       $orcidurl='https://orcid.org/oauth/authorize?client_id=APP-056GSP3J5RDS9KCM&response_type=code&scope=/authenticate&redirect_uri=http://104.197.102.240/data-science/'; 	
+           		$body = variable_get('email_author_submission_message', AUTHOR_SUBMISSION_MESSAGE);
+			$body .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$body = str_replace('{{author}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+		    $body = str_replace('{{author_email}}', $params['account'] -> mail, $body);
+			$body = str_replace('{{orcid_url}}', '<a href="'.$orcidurl.'">Click here to follow the link</a>', $body);             
+            $body = str_replace('{{tracking_number}}', $params['tracking_number'], $body);
+			$subject = variable_get('email_author_submission_subject', AUTHOR_SUBMISSION_SUBJECT);
+			$subject = str_replace('{{tracking_number}}', $params['tracking_number'], $subject);
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t($body, $variables, array('langcode' => $langcode));
+			break;
+
+		case 'submit' :
+	                 $orcidurl='https://orcid.org/oauth/authorize?client_id=APP-056GSP3J5RDS9KCM&response_type=code&scope=/authenticate&redirect_uri=http://104.197.102.240/data-science/';	
+                	$subject = variable_get('author_new_submission_subject', AUTHOR_SUBMISSION_NEW);
+
+			$subject = str_replace('{{tracking_number}}', $params['tracking_number'], $subject);
+
+			$body = variable_get('author_new_submission_message', AUTHOR_SUBMISSION_NEW_MSG);
+			$body = str_replace('{{tracking_number}}', $params['tracking_number'], $body);
+			$body .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$body = str_replace('{{author}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+			$body = str_replace('{{login}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+		    $body = str_replace('{{author_email}}', $params['account'] -> mail, $body);
+			$body = str_replace('{{orcid_url_email}}', '<a href="'.$orcidurl.'?mail='.$params['account'] -> mail.'">Click here to follow the link</a>', $body);
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t($body, $variables, array('langcode' => $langcode));
+			break;
+
+		case 'author_review' :
+			$subject = SUBMISSION_AUTHOR_APR_SUB;
+			$subject = str_replace('{{tracking_number}}', $params['tracking'], $subject);
+
+			$body = SUBMISSION_AUTHOR_APR_MSG;
+			$body .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$body = str_replace('{{author}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+            $body = str_replace('{{authoremail}}', $params['account'] ->mail, $body);
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t($body, $variables, array('langcode' => $langcode));
+			break;
+
+		case 'eic_submit' :
+			$langcode = '';//$message['language'] -> language;
+                        $sub = replace_email_tokens($params['nid'], variable_get('eic_submission_subject', SUBMISSION_EIC_SUB));
+                        $msg = replace_email_tokens($params['nid'], variable_get('eic_submission_message', SUBMISSION_EIC_MSG));
+			$message['subject'] = t($sub, array(), array('langcode' => $langcode));
+			$message['body'][] = t($msg, array(), array('langcode' => $langcode));
+
+			if(isset($params['cc']) && $params['cc'] != ''){
+			  $message['headers']['cc'] = $params['cc'];
+			}
+	
+                        if(isset($params['bcc']) && $params['bcc'] != ''){
+			  $message['headers']['bcc'] = $params['bcc'];
+			}      	
+                   	break;
+
+		case 'eic_decision' :
+			$subject = variable_get('email_decision_draft_subject', REV_DEC_LETTER_SUB);
+			$subject = str_replace('{{tracking_number}}', $params['tracking'], $subject);
+   
+			$langcode = '';
+			$message['subject'] = t($subject, array(), array('langcode' => $langcode));
+                        $msg = replace_email_tokens($params['nid'], variable_get('email_decision_draft_message', REV_DEC_LETTER_MSG));
+			$msg .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$message['body'][] = t($msg, array(), array('langcode' => $langcode));
+			break;
+
+		case 'eic_decision_pre' :
+			$subject = variable_get('email_min_eic_subject', REV_DEC_EIC_SUB);
+			$subject = str_replace('{{tracking_number}}', $params['tracking'], $subject);
+
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t(variable_get('email_min_eic_message', REV_DEC_EIC_MSG) .  variable_get('review_management_email_notice', SWJ_NOTICE), $variables, array('langcode' => $langcode));
+			break;
+
+		case 'editor' :
+			$subject = variable_get('email_editor_assn_subject', SUBMISSION_EDITOR_SUB);
+			$subject = str_replace('{{tracking_number}}', '', $subject);
+
+			$body = variable_get('email_editor_assn_message', SUBMISSION_EDITOR_MSG);
+			$body = str_replace('{{editor}}', $params['account'] ->field_first_name['und'][0]['value'] ." ". $params['account'] -> field_last_name['und'][0]['value'], $body);
+			$body .= variable_get('review_management_email_notice', SWJ_NOTICE);
+			$langcode = $message['language'] -> language;
+			$message['subject'] = t($subject, $variables, array('langcode' => $langcode));
+			$message['body'][] = t($body, $variables, array('langcode' => $langcode));
+			break;
+
+		case 'one-one' :
+            $eic_emails = get_eic_emails();
+            $langcode = '';
+			$message['subject'] = $params['subject'];
+			$body = $params['message'];
+
+			$message['body'][] = t($body, array(), array('langcode' => $langcode));
+
+			if(isset($params['cc']) && $params['cc'] != ''){
+			  $message['headers']['cc'] = $params['cc'];
+			}
+                        if(isset($params['bcc']) && $params['bcc'] != ''){
+			  $message['headers']['bcc'] = $params['bcc'];
+			}  
+
+			if(isset($params['Reply-to'])){
+				$message['headers']['Reply-to'] = $params['Reply-to'];
+			}
+                           
+                   	break;
+	}
+}
+}
+
+function update_actions_table($type, $nid, $vid, $description, $uid, $value) {
+
+	$d = db_insert('swj_actions') -> fields(array(
+		'nid' => $nid,
+		'type' => $type,
+		'action_by' => $uid,
+		'vid' => $vid,
+		'value' => '' . $value,
+		'adate' => REQUEST_TIME,
+		'description' => t($description),
+	)) -> execute();
+
+       $node = node_load($nid);
+       $node->field_last_action['und'][0]['value'] = REQUEST_TIME;
+       node_save($node);
+}
+
+//returns true if logged in user is EIC
+function is_eic_user(){
+global $user;
+  $isEIC =0;
+  $r = db_query("Select count(u.uid) from users_roles u INNER JOIN role r on u.rid = r.rid where u.uid =" . $user -> uid . " and r.name='" . EIC_ROLE . "'") -> fetchField();
+  if ($r == 1) {
+    return TRUE;
+  }
+  if(is_editorial_assitant()){
+    return TRUE;
+  }
+  return FALSE;
+}
+
+
+//returns true if logged in user is the responsible editor of the paper.
+function is_responsible_editor($node){
+  global $user;
+  $responsible_editor = get_responsible_editor($node);
+  if($user->uid ==  $responsible_editor){
+    return true;
+  }
+
+  return false;
+}
+
+//setting message after adding notes to the paper
+function testaction_node_submit($node, $form, &$form_state) {
+	// drupal_set_message($node->type);
+	if($node->type == 'notes'){
+		drupal_set_message('Thank You for adding your notes');
+	}
+}
+
+//hiding comment forbidden form for anonymous user
+//function testaction_node_view_alter(&$build) {
+//	if(count($build['comments']) == 0)
+//		unset($build['links']['comment']['#links']['comment_forbidden']);
+//}

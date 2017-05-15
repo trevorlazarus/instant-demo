@@ -1,0 +1,234 @@
+<?php
+	function orcid_authentication_init(){
+		// echo current_path();
+		// echo request_uri();
+		$orcid_id;
+		$module_path = drupal_get_path('module', 'orcid_authentication');
+		$path = explode('=', request_uri()); 
+		$requested_path = explode('=', request_uri());
+		if ($requested_path[0] == '/data-science/?mail'){
+			$email_split = explode('&', $requested_path[1]);
+			$name = $email_split[0];
+			$code = $requested_path[2];
+	            //	echo $code;
+			$data = 'client_id=APP-056GSP3J5RDS9KCM&client_secret=f5fcc22e-bd05-4c58-88c3-92d02be078dd&grant_type=authorization_code&redirect_uri=http://104.197.102.240/data-science/?mail='.$name.'&code='.$code;
+			
+			$options = array(
+        		'method' => 'POST',
+				'data' => $data,
+				'headers' => array('Content-Type' => 'application/x-www-form-urlencoded')
+        	);
+
+			$result = drupal_http_request('https://pub.orcid.org/oauth/token', $options);
+			
+			$obj = json_decode($result->data);
+			$orcid_id = $obj->{'orcid'};
+			//echo $orcid_id;
+			$user_bio_options = array(
+				'method' => 'GET',
+				'headers' => array('Accept' => 'application/orcid+json') 
+			);
+		    
+                        $init_id = db_query("SELECT init FROM `users` WHERE init = :orcid_id", array(":orcid_id" => $orcid_id))->fetchField();
+			
+			$mail_id = db_query("SELECT mail FROM `users` WHERE init = :orcid_id", array(":orcid_id" => $orcid_id))->fetchField();	
+
+                         if(empty($init_id))
+			{ 
+                             $updated = db_update('users') 
+			->fields(array('init' => $orcid_id, ))
+			->condition('name', $name, '=')
+			->execute();
+						
+			orcid_authentication_external_login_register_update($name, $email, $fname, $lname, $orcid_id, $module);		
+
+                 }
+			else{
+			drupal_set_message(t('The orcid id  <i>@orcid_id</i>  has been linked with  <i>@mail_id</i>,  If you want to change the email address for this orcid id <a href="https://orcid.org/oauth/authorize?client_id=APP-056GSP3J5RDS9KCM&response_type=code&scope=/authenticate&redirect_uri=http://104.197.102.240/data-science/&show_login=true">@link_text</a> and chnage it from myaccount',array('@orcid_id' => $init_id, '@mail_id' => $mail_id, '@link_text' => 'click here')), 'error');
+		    
+			
+			}
+
+		}	
+		
+		if ($path[0] == '/data-science/?code'){
+			$data = 'client_id=APP-056GSP3J5RDS9KCM&client_secret=f5fcc22e-bd05-4c58-88c3-92d02be078dd&grant_type=authorization_code&redirect_uri=http://104.197.102.240/data-science/&code='.$path[1];
+			
+			$options = array(
+        		'method' => 'POST',
+				'data' => $data,
+				'headers' => array('Content-Type' => 'application/x-www-form-urlencoded')
+        	);
+        	$result = drupal_http_request('https://pub.orcid.org/oauth/token', $options);
+        	$obj = json_decode($result->data);
+			$orcid_id = $obj->{'orcid'};
+			$user_bio_options = array(
+				'method' => 'GET',
+				'headers' => array('Accept' => 'application/orcid+json') 
+			);
+			$user_bio = drupal_http_request('https://pub.orcid.org/v1.1/'.$orcid_id, $user_bio_options);
+			$user_bio_obj = json_decode($user_bio->data);
+			$orcid_bio = $user_bio_obj->{'orcid-profile'}->{'orcid-bio'};
+			$name = NULL;
+			$name = db_query("SELECT name FROM `users` WHERE init = :orcid_id", array(":orcid_id" => $orcid_id))->fetchField();
+		
+				
+			
+			if(empty($name)){
+					if(empty($orcid_bio))
+					{
+						echo "Orcid bio is empty ";
+						
+					}
+				else{
+					$orcid_email = $user_bio_obj->{'orcid-profile'}->{'orcid-bio'}->{'contact-details'};
+					$fname = $user_bio_obj->{'orcid-profile'}->{'orcid-bio'}->{'personal-details'}->{'given-names'}->{'value'};
+					$lname = $user_bio_obj->{'orcid-profile'}->{'orcid-bio'}->{'personal-details'}->{'family-name'}->{'value'};
+					// echo $orcid_email;
+					// var_dump($user_bio_obj->{'orcid-profile'}->{'orcid-bio'}->{'contact-details'});
+					if(empty($orcid_email)){
+						drupal_add_js(array('orcid_authentication' => array('orcid_id' => $orcid_id)), array('type' => 'setting'));
+						drupal_add_js(array('orcid_authentication' => array('fname' => $fname)), array('type' => 'setting'));
+						drupal_add_js(array('orcid_authentication' => array('lname' => $lname)), array('type' => 'setting'));
+						drupal_add_js('https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js' ,'external');
+				        drupal_add_css($module_path .'/css/jquery.prompt.css','file');
+						drupal_add_js($module_path . '/js/jquery.prompt.js', 'file');
+						drupal_add_js($module_path . '/js/jquery-ui.js', 'file');	
+                       	drupal_add_js($module_path . '/js/orcidLoginProcess.js', 'file');
+					}
+					else{
+						$email = $user_bio_obj->{'orcid-profile'}->{'orcid-bio'}->{'contact-details'}->{'email'}[0]->{'value'};
+						$fname = $user_bio_obj->{'orcid-profile'}->{'orcid-bio'}->{'personal-details'}->{'given-names'}->{'value'};
+						$lname = $user_bio_obj->{'orcid-profile'}->{'orcid-bio'}->{'personal-details'}->{'family-name'}->{'value'};
+						// echo $email;
+						$fname = ucfirst($fname);   
+						$lname = ucfirst($lname);
+						//$name = $fname ." ". $lname;						
+						$name = $email;
+						//echo $name;
+						
+						orcid_authentication_external_login_register($name, $fname, $lname, $email, $orcid_id, $module);
+					}
+				}
+			}
+			 		
+			else{
+				$email = db_query("SELECT mail FROM `users` WHERE init = :orcid_id", array(":orcid_id" => $orcid_id))->fetchField();
+				orcid_authentication_external_login_register($name, $fname, $lname, $email, $orcid_id, $module);
+			}
+	}
+
+		$request_path = explode('=', request_uri());
+		if ($request_path[0] == '/data-science/?email'){
+			$email_split = explode('&', $request_path[1]);
+			$email = $email_split[0];
+			//$orcid_id = $request_path[2];
+			$orcid_id_split = explode('&', $request_path[2]);
+			$orcid_id = $orcid_id_split[0];
+			//$fname = $request_path[3];
+			$fname_split = explode('&', $request_path[3]);
+			$fname_lower = $fname_split[0];
+			$lname_lower = $request_path[4];
+			$fname = ucfirst($fname_lower);   
+			$lname = ucfirst($lname_lower);  
+			$name = $email;
+		
+                        $updated = db_update('users') 
+			->fields(array('init' => $orcid_id, ))
+			->condition('name', $name, '=')
+			->execute();     
+	
+			orcid_authentication_external_login_register($name, $fname, $lname, $email, $orcid_id, $module);
+		}
+	}
+
+	function orcid_authentication_external_login_register($name, $fname, $lname, $email, $orcid_id, $module) {
+		// echo $name;
+		$account = user_external_load($name);
+		// echo $account;
+		if(empty($email)){
+			if (!$account) {
+			// Register this new user.
+			$userinfo = array(
+				'name' => $name,
+				// 'mail' => $email,
+			    'pass' => user_password(),
+			    'init' => $orcid_id,
+			    'status' => 1,
+			    'access' => REQUEST_TIME,
+				'signature' => $fname,
+				'signature_format' => $lname,
+                'field_first_name' => array('und'=>array(0=>array('value'=>$fname))),
+		        'field_last_name' => array('und'=>array(0=>array('value'=>$lname)))	
+
+	);
+			$account = user_save(drupal_anonymous_user(), $userinfo);
+			// Terminate if an error occurred during user_save().
+			if (!$account) {
+			  drupal_set_message(t("Error saving user account."), 'error');
+			  return;
+			}
+			user_set_authmaps($account, array("authname_$module" => $name));
+			}
+		}
+		else{
+			// echo "without email";
+			if (!$account) {
+			// Register this new user.
+			$userinfo = array(
+				'name' => $name,
+				'mail' => $email,
+			    'pass' => user_password(),
+			    'init' => $orcid_id,
+			    'status' => 1,
+			    'access' => REQUEST_TIME,
+				'signature' => $fname,
+				'signature_format' => $lname,
+                'field_first_name' => array('und'=>array(0=>array('value'=>$fname))),
+		        'field_last_name' => array('und'=>array(0=>array('value'=>$lname)))	
+			);
+			$account = user_save(drupal_anonymous_user(), $userinfo);
+			// Terminate if an error occurred during user_save().
+			if (!$account) {
+			  drupal_set_message(t("Error saving user account."), 'error');
+			  return;
+			}
+			user_set_authmaps($account, array("authname_$module" => $name));
+			}
+		}
+
+		// Log user in.
+		$form_state['uid'] = $account->uid;
+		user_login_submit(array(), $form_state);
+	}
+	
+	
+function orcid_authentication_external_login_register_update($name, $email, $fname, $lname, $orcid_id, $module) {
+	  $account = user_external_load($name);
+	  if (!$account) {
+		// Register this new user.
+		$userinfo = array(
+		       'name' => $name,
+				'mail' => $email,
+			    'pass' => user_password(),
+				'init' => $orcid_id,
+			    'status' => 1,
+			    'access' => REQUEST_TIME,
+				'field_first_name' => array('und'=>array(0=>array('value'=>$fname))),
+		        'field_last_name' => array('und'=>array(0=>array('value'=>$lname)))	
+		);
+		$account = user_save(drupal_anonymous_user(), $userinfo);
+		// Terminate if an error occurred during user_save().
+		if (!$account) {
+		  drupal_set_message(t("Error saving user account."), 'error');
+		  return;
+		}
+		user_set_authmaps($account, array("authname_$module" => $name));
+	  }
+
+	  // Log user in.
+	  $form_state['uid'] = $account->uid;
+	  user_login_submit(array(), $form_state);
+	}
+	
+?>

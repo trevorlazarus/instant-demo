@@ -1,0 +1,74 @@
+<?php
+module_load_include('module', 'verify');
+
+function reviewer_response_menu() {
+	$items['reviewer/form/response'] = array(
+		'title' => 'Please provide your response', //The name of the menu that will be displayed
+		'page callback' => 'reviewer_response_page_callback', //The name of the function that will output a page
+		'access callback' => TRUE
+	);
+	return $items;
+}
+ 
+function reviewer_response_page_callback() {
+	//The argument is the name of the function with the form details
+	return drupal_get_form('reviewer_response_form');
+}
+
+function reviewer_response_form($form, &$form_state) {
+	$questions = array(
+		'yes' => t('Yes, I will accept to review this paper'),
+		'no' => t('No, I am not interested'), 
+	);
+
+	$form['response'] = array(
+		'#title' => t('Select your option'),
+		'#type' => 'radios',
+		// '#description' => t(''),
+		'#options' => $questions,
+		'#required' => TRUE,
+	);
+
+	$form['submit'] = array(
+		'#value' => 'Submit',
+		'#type' => 'submit',
+	);
+	return $form;
+}
+
+function reviewer_response_form_submit($form, &$form_state) {
+	drupal_set_message($form_state['values']['response']);
+}
+
+function reviewer_response_node_view($node, $view_mode, $langcode) {
+  if ($node->type == 'submit_paper') {
+ $requested_path = explode('?', request_uri());
+ $email_split = explode('=', $requested_path[1]);
+
+ $email = $email_split[0];
+ $mail_id = $email_split[1];
+ $mail_ids = base64_decode($mail_id);
+
+//$decrypted_string = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $secret_key, $mail_id, MCRYPT_MODE_CBC, $iv);
+//echo $decrypted_string;
+ $user_id = db_query("SELECT uid FROM `users` WHERE mail = :email", array(":email" => $mail_ids))->fetchField();
+ 
+ if (user_is_anonymous() && $email =="emailid") {
+  	$review_form = array(drupal_get_form('verify_form', $node -> nid, $node -> vid, $user_id));
+
+    // $form = drupal_get_form('verify_form');
+
+    $node->content['verify_form'] = array(
+              '#title' => 'Confirm Review Request',
+              '#type' => 'fieldset',
+              '#description' => 'Confirm or reject invitation to review paper',
+              'verify' => $review_form,
+              '#weight' => 20,
+          );
+
+  }
+}
+
+}
+
+?>

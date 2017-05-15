@@ -1,0 +1,38 @@
+<?php
+function update_nodes_menu() {
+	$items['update-existing-nodes'] = array(
+	'title' => 'Custom page',
+	'page callback' => 'update_nodes_custom',
+	'access arguments' => array('access content'),
+	);
+
+	return $items;
+}
+
+function update_nodes_custom() {
+	$node_type = "submit_paper"; // can find this on the node type's "edit" screen in the Drupal admin section.
+
+	$result = db_query("SELECT nid FROM node WHERE type = :nodeType ", array(':nodeType'=>$node_type)); //<-- change 1
+
+	$nids = array();
+	foreach ($result as $obj) {  //<-- change 2
+		$nids[] = $obj->nid;
+	}
+	// dpm($nids);
+	// $node_title = array();
+	foreach($nids as $nid){
+		$node = node_load($nid);
+		// if($node->field_approval['und'][0]['value'] == 'approved'){
+		// 	// $node_title[] = $node->field_approval['und'][0]['value'];
+		// 	$node->field_decision_eic['und'][0]['value'] = $node->field_decision['und'][0]['value'];
+  		// 	node_save($node);
+		// }
+	        $node->comment = 2;
+        	node_save($node);
+	}
+	// dpm($node_title);
+	return '<p>Updated nodes</p>';
+}
+
+?>
+

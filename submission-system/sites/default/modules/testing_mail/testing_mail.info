@@ -1,0 +1,5 @@
+;$Id$
+name = Testing Email
+description = Testing email not to send spam.
+package = Custom Module
+core = 7.x

@@ -1,0 +1,168 @@
+<?php
+function reminder_email_cron(){
+  module_load_include('module', 'testaction', 'testaction');
+  //automaitc reminder to reviewer if he/she has not accepted/rejected the invite
+  $result_accept = db_query("SELECT * FROM `paper_reviewer` WHERE `accept` = 0 AND `next_reminder` > 0");
+  foreach ($result_accept as $record_accept) {
+    $date=date_create();
+    date_timestamp_set($date,$record_accept->{"next_reminder"});
+    $t = time();
+    $today_date=date_create();
+    date_timestamp_set($today_date,$t);
+    // condition to check today's date
+	
+    if(date_format($today_date,"Y-m-d") == date_format($date,"Y-m-d")){
+      $reviewer = user_load($record_accept->ruid);
+	  $node_nid = $record_accept -> nid;
+     $node = db_query("SELECT nid FROM `node` WHERE nid = :node_nid", array(":node_nid" => $node_nid))->fetchField();
+	  if($reviewer != NULL && $node != NULL){
+      $orcid_url = 'https://orcid.org/oauth/authorize?client_id=APP-056GSP3J5RDS9KCM&response_type=code&scope=/authenticate&redirect_uri=http://104.197.102.240/data-science/';  
+      $reviewer = user_load($record_accept->ruid);
+      $sub = variable_get('email_rev_reminder_subject', REV_REMINDER_SUB);
+      $message = variable_get('email_rev_reminder_message', REV_REMINDER_MSG);
+
+      $sub = replace_email_tokens($record_accept->nid, $sub);
+      $message = replace_email_tokens($record_accept->nid, $message);
+     // $message = str_replace('{{reviewer}}', $reviewer->name, $message);
+      $message = str_replace('{{reviewer}}', $reviewer-> field_first_name['und'][0]['value'] ." ". $reviewer-> field_last_name['und'][0]['value'] , $message); 
+      $token = get_token($reviewer);
+      global $base_url; 
+      $direct_url = url(drupal_get_path_alias('node/' . $record_accept -> nid), array('absolute'=> TRUE, 'query' => array('l' => $token)));
+      $message = str_replace('{{direct_urls}}', $direct_url, $message);
+     $message = str_replace('{{site_url_guide}}','<a href="'.$base_url.'/content/guidelines">Click here to follow the link</a>', $message); 
+     // $message = str_replace('{{orcid_url_email}}', '<a href="'.$orcid_url.'?mail='.$reviewer -> mail.'">Click here to follow the link</a>', $message);  
+      $url =  url(drupal_get_path_alias('node/' . $record_accept -> nid), array('absolute' => TRUE));
+     $mail_encrypt = base64_encode($reviewer -> mail); 
+     $message = str_replace('{{direct_url_email}}', '<a href="'.$url.'/?emailid='.$mail_encrypt.'">Click here to follow the link</a>', $message); 
+      $params['subject'] = $sub;
+      $params['message'] = $message;
+      drupal_mail('testaction', 'one-one', $reviewer->mail, '', $params);
+
+      //updating action history
+      update_actions_table(4, $record_accept->nid, $record_accept->vid, '<b>Automatic Reminder Sent<br/>To :</b> ' . $reviewer->mail . '<br/><b>subject :</b> ' . $params['subject'] . '<br/> <b>message: </b>' . $params['message'], 1, 1);
+
+      //updating next reminder in the database
+      $next_rem = time() + variable_get('review_management_review_followup', 1) * 24 * 60 * 60;
+      $query = db_update('paper_reviewer') -> fields(array(
+      'next_reminder' => $next_rem,
+      )) -> condition('nid', $record_accept->nid, '=') -> condition('vid', $record_accept->vid, '=') -> condition('ruid', $record_accept->ruid, '=') -> execute();
+    }
+   }
+  }
+
+  // remider to reviewer if he/she has accepted the invitation to review but has not submitted the review.
+  $result_submitted = db_query("SELECT * FROM `paper_reviewer` WHERE `submitted` = 0 AND `accept` = 2 AND `next_reminder` > 0");
+  foreach ($result_submitted as $record_submitted) {
+        global $base_url;  
+ 	$date=date_create();
+  	date_timestamp_set($date,$record_submitted->{"next_reminder"});
+    // drupal_set_message($record_submitted->{"next_reminder"});
+  	$t = time();
+  	$today_date=date_create();
+  	date_timestamp_set($today_date,$t);
+    //condition to check today's date
+  	if(date_format($today_date,"Y-m-d") == date_format($date,"Y-m-d")){
+      // drupal_set_message("result");
+	   $reviewer = user_load($record_accept->ruid);
+	  $node_nid = $record_accept -> nid;
+	  $node = db_query("SELECT nid FROM `node` WHERE nid = :node_nid", array(":node_nid" => $node_nid))->fetchField();
+	  if($reviewer != NULL && $node != NULL){
+      $reviewer = user_load($record_submitted->ruid);
+      //$sub = variable_get('email_accept_rev_reminder_subject', ACCEPT_REV_REMINDER_SUB);
+      $message = variable_get('email_accept_rev_reminder_message', ACCEPT_REV_REMINDER_MSG);
+      $sub = replace_email_tokens($record_submitted->nid, $sub);
+      $message = replace_email_tokens($record_submitted->nid, $message);
+     // $message = str_replace('{{reviewer}}', $reviewer->name, $message);
+      $message = str_replace('{{reviewer}}', $reviewer-> field_first_name['und'][0]['value'] ." ". $reviewer-> field_last_name['und'][0]['value'] , $message);  
+     $token = get_token($reviewer);
+      $direct_url = url(drupal_get_path_alias('node/' . $record_submitted -> nid), array('absolute'=> TRUE, 'query' => array('l' => $token)));
+      $message = str_replace('{{site_url_guide}}','<a href="'.$base_url.'/content/guidelines">Click here to follow the link</a>', $message); 
+      $message = str_replace('{{direct_url_email}}', $direct_url, $message);
+      $params['subject'] = $sub;
+      $params['message'] = $message;
+     drupal_mail('testaction', 'one-one', $reviewer->mail, '', $params);
+
+      //update action history
+      update_actions_table(4, $record_submitted->nid, $record_submitted->vid, '<b>Automatic Reminder Sent<br/>To :</b> ' . $reviewer->mail . '<br/><b>subject :</b> ' . $params['subject'] . '<br/> <b>message: </b>' . $params['message'], 1, 1);
+
+      //update next reminder in database
+      $next_rem = time() + variable_get('review_management_first', 7) * 24 * 60 * 60;
+      $query = db_update('paper_reviewer') -> fields(array(
+      'next_reminder' => $next_rem,
+      )) -> condition('nid', $record_submitted->nid, '=') -> condition('vid', $record_submitted->vid, '=') -> condition('ruid', $record_submitted->ruid, '=') -> execute();
+  	 }
+	}
+  }
+
+  //reminder email to responsible editor
+  $result_editor_reminder = db_query("SELECT * FROM `editor_reminder` WHERE `next_reminder` > 0");
+  foreach ($result_editor_reminder as $record_editor_reminder) {
+    $date=date_create();
+    date_timestamp_set($date,$record_editor_reminder->{"next_reminder"});
+    $t = time();
+    $today_date=date_create();
+    date_timestamp_set($today_date,$t);
+    //condition to check today's date
+    if(date_format($today_date,"Y-m-d") == date_format($date,"Y-m-d")){
+		$reviewer = user_load($record_accept->ruid);
+	  $node_nid = $record_accept -> nid;
+	  $node = db_query("SELECT nid FROM `node` WHERE nid = :node_nid", array(":node_nid" => $node_nid))->fetchField();
+	  if($reviewer != NULL && $node != NULL){
+      $editor = user_load($record_editor_reminder->ruid);
+      $sub = variable_get('email_editor_reminder_subject', EDITOR_REMINDER_SUB);
+      $msg = variable_get('email_editor_reminder_message', EDITOR_REMINDER_MSG);
+      $msg = replace_email_tokens($record_editor_reminder->nid, $msg);
+      $sub = replace_email_tokens($record_editor_reminder->nid, $sub);
+      $params = array();
+      $params['message'] = $msg;
+      $params['subject'] = $sub;
+
+      drupal_mail('testaction', 'one-one', $editor->mail, '', $params);
+      //update actions history
+       update_actions_table(4, $record_editor_reminder->nid, $record_editor_reminder->vid, '<b>Automatic Reminder Sent<br/>To :</b> ' . $editor->mail . '<br/><b>subject :</b> ' . $params['subject'] . '<br/> <b>message: </b>' . $params['message'], 1, 1);
+ 
+      //udpate next reminder date in database
+      $next_rem = time() + variable_get('review_management_edit_followup', 1) * 24 * 60 * 60;
+      $query = db_update('editor_reminder') -> fields(array(
+      'next_reminder' => $next_rem,
+      )) -> condition('nid', $record_editor_reminder->nid, '=') -> condition('vid', $record_editor_reminder->vid, '=') -> condition('ruid', $record_editor_reminder->ruid, '=') -> execute();
+     }
+	}
+  }
+}
+
+/**
+ * Implementation of hook_mail().
+ */
+function reminder_email_mail($key, &$message, $params){
+//	echo "inside email";
+
+  // Set the mail content type to html to send an html e-mail (optional).
+  // $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
+
+  // Grab the subject and body from params and add it to the message.
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['body'];
+
+  switch ($key) {
+    case "reminder_email_accept":
+      // Make other changes here if desired...
+      break;
+
+    case "reminder_email_reviewer":
+      // Make other changes here if desired...
+      break;
+
+    case "reminder_email_submitted":
+      // Make other changes here if desired...
+      break;
+
+    case "reminder_email_editor":
+      // Make other changes here if desired...
+      break;
+  }
+
+}
+
+
+?>
